@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEMON - Sistema de Inventario</title>
+</head>
+<body>
+
+    <h1>SISTEMA DE INVENTARIO - LEMON</h1>
+
+    <div>
+        <button onclick="verModulo('inicio')">Inicio</button>
+        <button onclick="verModulo('productos')">Productos</button>
+        <button onclick="verModulo('movimientos')">Movimientos</button>
+    </div>
+
+    <hr>
+
+    <div id="mod-inicio" class="modulo">
+        <h2>Página de Inicio</h2>
+        <p>Bienvenido al sistema LEMON para el control de inventario y stock.</p>
+        
+        <h3>Resumen general:</h3>
+        <ul>
+            <li>Total de productos: <span id="lbl-total">4</span></li>
+            <li>Productos con stock bajo: 1</li>
+        </ul>
+    </div>
+
+    <div id="mod-productos" class="modulo" style="display: none;">
+        <h2>Catálogo de Productos</h2>
+
+        <h3>Agregar Producto</h3>
+        <form onsubmit="agregarProducto(event)">
+            <input type="text" id="nuevo-codigo" placeholder="Código" required>
+            <input type="text" id="nuevo-nombre" placeholder="Producto" required>
+            <input type="number" id="nuevo-precio" placeholder="Precio" required>
+            <input type="number" id="nuevo-stock" placeholder="Stock" required>
+            <button type="submit">Guardar</button>
+        </form>
+
+        <br>
+
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-productos">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="mod-movimientos" class="modulo" style="display: none;">
+        <h2>Movimientos de Entrada / Salida</h2>
+
+        <h3>Registrar Operación</h3>
+        <form onsubmit="registrarMovimiento(event)">
+            <label>Tipo:</label>
+            <select id="mov-tipo">
+                <option value="Entrada">Entrada</option>
+                <option value="Salida">Salida</option>
+            </select>
+
+            <label>Producto:</label>
+            <select id="mov-producto">
+                <option>Taladro</option>
+                <option>Martillo</option>
+                <option>Sierra Circular</option>
+                <option>Cinta Métrica</option>
+            </select>
+
+            <label>Cantidad:</label>
+            <input type="number" id="mov-cantidad" min="1" value="1" required>
+
+            <button type="submit">Registrar</button>
+        </form>
+
+        <br>
+
+        <h3>Historial</h3>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-historial">
+                <tr>
+                    <td>Entrada</td>
+                    <td>Taladro</td>
+                    <td>+5</td>
+                </tr>
+                <tr>
+                    <td>Salida</td>
+                    <td>Martillo</td>
+                    <td>-2</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let listaProductos = [
+            { codigo: '001', producto: 'Taladro', precio: 2500, stock: 8 },
+            { codigo: '002', producto: 'Martillo', precio: 350, stock: 15 },
+            { codigo: '003', producto: 'Sierra Circular', precio: 3800, stock: 3 },
+            { codigo: '004', producto: 'Cinta Métrica', precio: 120, stock: 25 }
+        ];
+
+        function verModulo(nombreModulo) {
+            document.querySelectorAll('.modulo').forEach(m => m.style.display = 'none');
+            document.getElementById(`mod-${nombreModulo}`).style.display = 'block';
+        }
+
+        function cargarProductos() {
+            const tbody = document.getElementById('tabla-productos');
+            tbody.innerHTML = '';
+
+            listaProductos.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.codigo}</td>
+                        <td>${item.producto}</td>
+                        <td>${item.precio}</td>
+                        <td>${item.stock}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('lbl-total').innerText = listaProductos.length;
+        }
+
+        function agregarProducto(e) {
+            e.preventDefault();
+            const nuevo = {
+                codigo: document.getElementById('nuevo-codigo').value,
+                producto: document.getElementById('nuevo-nombre').value,
+                precio: parseFloat(document.getElementById('nuevo-precio').value),
+                stock: parseInt(document.getElementById('nuevo-stock').value)
+            };
+            listaProductos.push(nuevo);
+            cargarProductos();
+            e.target.reset();
+        }
+
+        function registrarMovimiento(e) {
+            e.preventDefault();
+            const tipo = document.getElementById('mov-tipo').value;
+            const prod = document.getElementById('mov-producto').value;
+            const cant = document.getElementById('mov-cantidad').value;
+            const signo = tipo === 'Entrada' ? '+' : '-';
+
+            const tbody = document.getElementById('tabla-historial');
+            tbody.innerHTML = `
+                <tr>
+                    <td>${tipo}</td>
+                    <td>${prod}</td>
+                    <td>${signo}${cant}</td>
+                </tr>
+            ` + tbody.innerHTML;
+
+            e.target.reset();
+        }
+
+        cargarProductos();
+    </script>
+
+</body>
+</html>
